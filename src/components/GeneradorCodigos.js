@@ -52,7 +52,7 @@ const GeneradorCodigos = ({ abrirCrud }) => {
     <div className="d-flex justify-content-center align-items-center vh-100">
       <Card
         className="shadow-lg p-4"
-        style={{ maxWidth: "800px", width: "100%" }}
+        style={{ maxWidth: "1000px", width: "100%" }}
       >
         {/* Título y botón de gestión alineado a la izquierda */}
         <Row className="align-items-center mb-4">
