@@ -17,6 +17,9 @@ const CrudNiveles = ({ cerrarCrud }) => {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modo, setModo] = useState("");
   const [nivelSeleccionado, setNivelSeleccionado] = useState(null);
+  const [nivelFiltro, setNivelFiltro] = useState(null); // Estado para filtrar por nivel
+  const [nivelPadreActual, setNivelPadreActual] = useState(null); // Guarda el nivel anterior
+
   const [nuevoNivel, setNuevoNivel] = useState({
     codigo: "",
     nombre: "",
@@ -29,19 +32,25 @@ const CrudNiveles = ({ cerrarCrud }) => {
   }, []);
 
   useEffect(() => {
-    if (!busqueda) {
-      setNivelesFiltrados(niveles); // ✅ Mostrar todos los niveles si la búsqueda está vacía
-      return;
+    let filtrados = niveles;
+
+    if (nivelFiltro !== null) {
+      filtrados = niveles.filter(
+        (n) => n.nivelPadre && n.nivelPadre.id === nivelFiltro
+      );
     }
-    const filtrados = niveles.filter(
-      (nivel) =>
-        (nivel.codigo &&
-          nivel.codigo.toLowerCase().includes(busqueda.toLowerCase())) ||
-        (nivel.nombre &&
-          nivel.nombre.toLowerCase().includes(busqueda.toLowerCase()))
-    );
+
+    if (busqueda) {
+      filtrados = filtrados.filter(
+        (n) =>
+          (n.codigo &&
+            n.codigo.toLowerCase().includes(busqueda.toLowerCase())) ||
+          (n.nombre && n.nombre.toLowerCase().includes(busqueda.toLowerCase()))
+      );
+    }
+
     setNivelesFiltrados(filtrados);
-  }, [busqueda, niveles]);
+  }, [busqueda, niveles, nivelFiltro]);
 
   const cargarNiveles = async () => {
     try {
@@ -152,6 +161,10 @@ const CrudNiveles = ({ cerrarCrud }) => {
       alert("❌ No se pudo eliminar el nivel.");
     }
   };
+  const filtrarPorNivel = (nivel) => {
+    setNivelFiltro(nivel.id);
+    setNivelPadreActual(nivel.nivelPadre ? nivel.nivelPadre.id : null);
+  };
 
   return (
     <Container className="mt-4">
@@ -188,6 +201,27 @@ const CrudNiveles = ({ cerrarCrud }) => {
       </Row>
 
       {/* Tabla de Niveles */}
+      <Row className="mb-3">
+        <Col>
+          {nivelFiltro !== null && (
+            <>
+              {nivelPadreActual !== null && (
+                <Button
+                  className="me-2"
+                  variant="secondary"
+                  onClick={() => setNivelFiltro(nivelPadreActual)}
+                >
+                  Volver al Nivel Anterior
+                </Button>
+              )}
+              <Button variant="secondary" onClick={() => setNivelFiltro(null)}>
+                Mostrar Todos
+              </Button>
+            </>
+          )}
+        </Col>
+      </Row>
+
       <Table
         striped
         bordered
@@ -204,53 +238,59 @@ const CrudNiveles = ({ cerrarCrud }) => {
           </tr>
         </thead>
         <tbody>
-          {nivelesFiltrados.map((nivel) => {
-            //console.log("📌 Nivel mostrado en la tabla:", nivel); // Agregar esto para ver qué se renderiza
-
-            return (
-              <tr key={nivel.id}>
-                <td>{nivel.codigo}</td>
-                <td>{nivel.nombre}</td>
-                <td>
-                  {nivel.nivelPadre && nivel.nivelPadre.nombre
-                    ? `${nivel.nivelPadre.codigo || "Sin código"} - ${
-                        nivel.nivelPadre.nombre
-                      }`
-                    : "Raíz"}
-                </td>
-                <td>
-                  <Button
-                    variant="info"
-                    className="me-2"
-                    onClick={() => abrirModal("Ver", nivel)}
-                  >
-                    Ver
-                  </Button>
-                  <Button
-                    variant="warning"
-                    className="me-2"
-                    onClick={() => abrirModal("Modificar", nivel)}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="danger"
-                    className="me-2"
-                    onClick={() => eliminarNivel(nivel.id)}
-                  >
-                    Eliminar
-                  </Button>
-                  <Button
-                    variant="primary"
-                    className="me-2"
-                    onClick={() => abrirModal("CrearSubnivel", nivel)}
-                  >
-                    + Subnivel
-                  </Button>
-                </td>
-              </tr>
-            );
-          })}
+          {nivelesFiltrados.map((nivel) => (
+            <tr
+              key={nivel.id}
+              onClick={() => filtrarPorNivel(nivel)}
+              style={{ cursor: "po  inter" }}
+            >
+              <td>{nivel.codigo}</td>
+              <td>{nivel.nombre}</td>
+              <td>{nivel.nivelPadre ? nivel.nivelPadre.nombre : "Raíz"}</td>
+              <td>
+                <Button
+                  variant="info"
+                  className="me-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    abrirModal("Ver", nivel);
+                  }}
+                >
+                  Ver
+                </Button>
+                <Button
+                  variant="warning"
+                  className="me-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    abrirModal("Modificar", nivel);
+                  }}
+                >
+                  Editar
+                </Button>
+                <Button
+                  variant="danger"
+                  className="me-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    eliminarNivel(nivel.id);
+                  }}
+                >
+                  Eliminar
+                </Button>
+                <Button
+                  variant="primary"
+                  className="me-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    abrirModal("CrearSubnivel", nivel);
+                  }}
+                >
+                  + Subnivel
+                </Button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </Table>
 
