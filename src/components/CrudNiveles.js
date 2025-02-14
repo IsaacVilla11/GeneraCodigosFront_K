@@ -29,6 +29,10 @@ const CrudNiveles = ({ cerrarCrud }) => {
   }, []);
 
   useEffect(() => {
+    if (!busqueda) {
+      setNivelesFiltrados(niveles); // ✅ Mostrar todos los niveles si la búsqueda está vacía
+      return;
+    }
     const filtrados = niveles.filter(
       (nivel) =>
         (nivel.codigo &&
@@ -38,10 +42,33 @@ const CrudNiveles = ({ cerrarCrud }) => {
     );
     setNivelesFiltrados(filtrados);
   }, [busqueda, niveles]);
+
   const cargarNiveles = async () => {
     try {
       const response = await axios.get("http://localhost:8080/api/niveles");
-      setNiveles(response.data);
+
+      // 📌 Verificar datos recibidos antes de procesarlos
+      console.log("📌 Datos recibidos en el frontend:", response.data);
+
+      // Cargar padres si solo llega el ID en vez del objeto
+      const nivelesConPadre = await Promise.all(
+        response.data.map(async (nivel) => {
+          if (nivel.nivelPadre && typeof nivel.nivelPadre === "number") {
+            try {
+              const padreResponse = await axios.get(
+                `http://localhost:8080/api/niveles/${nivel.nivelPadre}`
+              );
+              return { ...nivel, nivelPadre: padreResponse.data };
+            } catch (error) {
+              console.error("❌ Error al obtener nivel padre:", error);
+              return { ...nivel, nivelPadre: null };
+            }
+          }
+          return nivel;
+        })
+      );
+
+      setNiveles(nivelesConPadre);
     } catch (error) {
       console.error("❌ Error al cargar niveles:", error);
     }
@@ -177,17 +204,17 @@ const CrudNiveles = ({ cerrarCrud }) => {
           </tr>
         </thead>
         <tbody>
-          {nivelesFiltrados.map(
-            (
-              nivel // ✅ Usar niveles filtrados
-            ) => (
+          {nivelesFiltrados.map((nivel) => {
+            console.log("📌 Nivel mostrado en la tabla:", nivel); // Agregar esto para ver qué se renderiza
+
+            return (
               <tr key={nivel.id}>
                 <td>{nivel.codigo}</td>
                 <td>{nivel.nombre}</td>
                 <td>
-                  {nivel.nivelPadre
+                  {nivel.nivelPadre && nivel.nivelPadre.nombre
                     ? `${nivel.nivelPadre.codigo || "Sin código"} - ${
-                        nivel.nivelPadre.nombre || "Sin nombre"
+                        nivel.nivelPadre.nombre
                       }`
                     : "Raíz"}
                 </td>
@@ -222,8 +249,8 @@ const CrudNiveles = ({ cerrarCrud }) => {
                   </Button>
                 </td>
               </tr>
-            )
-          )}
+            );
+          })}
         </tbody>
       </Table>
 
