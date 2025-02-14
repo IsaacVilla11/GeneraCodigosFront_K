@@ -48,7 +48,7 @@ const CrudNiveles = ({ cerrarCrud }) => {
       const response = await axios.get("http://localhost:8080/api/niveles");
 
       // 📌 Verificar datos recibidos antes de procesarlos
-      console.log("📌 Datos recibidos en el frontend:", response.data);
+      //console.log("📌 Datos recibidos en el frontend:", response.data);
 
       // Cargar padres si solo llega el ID en vez del objeto
       const nivelesConPadre = await Promise.all(
@@ -116,7 +116,7 @@ const CrudNiveles = ({ cerrarCrud }) => {
         : null,
     };
 
-    console.log("📤 Enviando datos al backend:", nivelData);
+    //console.log("📤 Enviando datos al backend:", nivelData);
 
     try {
       if (modo === "Crear" || modo === "CrearSubnivel") {
@@ -205,7 +205,7 @@ const CrudNiveles = ({ cerrarCrud }) => {
         </thead>
         <tbody>
           {nivelesFiltrados.map((nivel) => {
-            console.log("📌 Nivel mostrado en la tabla:", nivel); // Agregar esto para ver qué se renderiza
+            //console.log("📌 Nivel mostrado en la tabla:", nivel); // Agregar esto para ver qué se renderiza
 
             return (
               <tr key={nivel.id}>

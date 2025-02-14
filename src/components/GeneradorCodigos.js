@@ -1,18 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NivelSelector from "./NivelSelector";
 import { Button, Container, Row, Col, Form, Card } from "react-bootstrap";
+import axios from "axios";
 
 const GeneradorCodigos = ({ abrirCrud }) => {
-  const [niveles, setNiveles] = useState(Array(6).fill({ id: "", codigo: "" }));
+  const [niveles, setNiveles] = useState([]); // Se inicializa vacío
+  const [totalNiveles, setTotalNiveles] = useState(6); // ✅ Mínimo 6 niveles
+
+  useEffect(() => {
+    obtenerCantidadNiveles();
+  }, []);
+
+  const obtenerCantidadNiveles = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/api/niveles/cantidadMaxima"
+      );
+      const cantidadNiveles = Math.max(6, response.data); // ✅ Asegura mínimo 6 niveles
+      setTotalNiveles(cantidadNiveles);
+
+      // Inicializar niveles vacíos con la cantidad real de niveles
+      setNiveles(Array(cantidadNiveles).fill({ id: "", codigo: "" }));
+    } catch (error) {
+      console.error("❌ Error al obtener la cantidad de niveles:", error);
+    }
+  };
 
   const manejarSeleccion = (index, nivelSeleccionado) => {
     let nuevosNiveles = [...niveles];
 
-    // ✅ Verifica si `nivelSeleccionado` es `null` y asigna un objeto vacío
+    // ✅ Si `nivelSeleccionado` es `null`, se asigna un objeto vacío
     nuevosNiveles[index] = nivelSeleccionado || { id: "", codigo: "" };
 
     // ✅ Limpiar niveles siguientes para evitar valores incorrectos
-    for (let i = index + 1; i < niveles.length; i++) {
+    for (let i = index + 1; i < nuevosNiveles.length; i++) {
       nuevosNiveles[i] = { id: "", codigo: "" };
     }
 
@@ -25,9 +46,8 @@ const GeneradorCodigos = ({ abrirCrud }) => {
       .map((nivel) => nivel.codigo)
       .join("");
 
-    // Opcionalmente puedes mostrar un alert o hacer algo con el código generado
     console.log(
-      "Código generado:",
+      "📌 Código generado:",
       codigo || "Ningún código seleccionado aún."
     );
   };
@@ -40,8 +60,8 @@ const GeneradorCodigos = ({ abrirCrud }) => {
 
     navigator.clipboard
       .writeText(codigo)
-      .then(() => alert("Código copiado al portapapeles"))
-      .catch((err) => console.error("Error al copiar:", err));
+      .then(() => alert("✅ Código copiado al portapapeles"))
+      .catch((err) => console.error("❌ Error al copiar:", err));
   };
 
   return (
@@ -57,12 +77,12 @@ const GeneradorCodigos = ({ abrirCrud }) => {
         </Col>
       </Row>
 
-      {Array.from({ length: 6 }, (_, i) => (
+      {Array.from({ length: totalNiveles }, (_, i) => (
         <Form.Group key={i} className="mb-2">
           <Form.Label className="text-success">Nivel {i + 1}:</Form.Label>
           <NivelSelector
             nivel={i + 1}
-            nivelPadre={i > 0 ? niveles[i - 1]?.id || "" : null} // ✅ Evita acceder a `niveles[-1]`
+            nivelPadre={i > 0 ? niveles[i - 1]?.id || "" : null}
             onSelect={(valor) => manejarSeleccion(i, valor)}
             value={niveles[i]}
           />
