@@ -22,9 +22,9 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
         url = `http://localhost:8080/api/niveles/padre?nivelPadreId=${nivelPadre}`;
         //console.log("📡 Cargando subniveles desde: ", url);
       } else {
-        console.log(
-          "⚠️ No hay un nivel padre seleccionado. No se cargan datos."
-        );
+        //console.log(
+          //"⚠️ No hay un nivel padre seleccionado. No se cargan datos."
+        //);
         setLoading(false);
         return;
       }

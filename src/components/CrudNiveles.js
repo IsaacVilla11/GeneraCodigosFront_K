@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Toast, ToastContainer } from "react-bootstrap";
 import {
   Button,
   Table,
@@ -26,6 +27,11 @@ const CrudNiveles = ({ cerrarCrud }) => {
     nivelPadreId: "",
   });
   const [busqueda, setBusqueda] = useState("");
+  const [mensaje, setMensaje] = useState({
+    mostrar: false,
+    texto: "",
+    tipo: "",
+  });
 
   useEffect(() => {
     cargarNiveles();
@@ -51,6 +57,10 @@ const CrudNiveles = ({ cerrarCrud }) => {
 
     setNivelesFiltrados(filtrados);
   }, [busqueda, niveles, nivelFiltro]);
+  const mostrarMensaje = (texto, tipo = "success") => {
+    setMensaje({ mostrar: true, texto, tipo });
+    setTimeout(() => setMensaje({ mostrar: false, texto: "", tipo: "" }), 3000);
+  };
 
   const cargarNiveles = async () => {
     try {
@@ -125,42 +135,39 @@ const CrudNiveles = ({ cerrarCrud }) => {
         : null,
     };
 
-    //console.log("📤 Enviando datos al backend:", nivelData);
-
     try {
       if (modo === "Crear" || modo === "CrearSubnivel") {
         await axios.post("http://localhost:8080/api/niveles", nivelData);
-        alert("✅ Nivel creado con éxito.");
+        mostrarMensaje("✅ Nivel creado con éxito.");
       } else {
         await axios.put(
           `http://localhost:8080/api/niveles/${nuevoNivel.id}`,
           nivelData
         );
-        alert("✅ Nivel actualizado con éxito.");
+        mostrarMensaje("✅ Nivel actualizado con éxito.");
       }
       cargarNiveles();
       setMostrarModal(false);
     } catch (error) {
       console.error("❌ Error al guardar nivel:", error);
-      alert("❌ Error al guardar nivel.");
+      mostrarMensaje("❌ Error al guardar nivel.", "danger");
     }
   };
 
   const eliminarNivel = async (id) => {
-    const confirmacion = window.confirm(
-      "¿Estás seguro de que deseas eliminar este nivel?"
-    );
+    const confirmacion = window.confirm("¿Estás seguro de que deseas eliminar este nivel?");
     if (!confirmacion) return;
-
+  
     try {
       await axios.delete(`http://localhost:8080/api/niveles/${id}`);
-      alert("✅ Nivel eliminado con éxito.");
+      mostrarMensaje("✅ Nivel eliminado con éxito.");
       cargarNiveles();
     } catch (error) {
       console.error("❌ Error al eliminar nivel:", error);
-      alert("❌ No se pudo eliminar el nivel.");
+      mostrarMensaje("❌ No se pudo eliminar el nivel.", "danger");
     }
   };
+
   const filtrarPorNivel = (nivel) => {
     setNivelFiltro(nivel.id);
     setNivelPadreActual(nivel.nivelPadre ? nivel.nivelPadre.id : null);
@@ -168,6 +175,12 @@ const CrudNiveles = ({ cerrarCrud }) => {
 
   return (
     <Container className="mt-4">
+      <ToastContainer position="top-end" className="p-3">
+  <Toast bg={mensaje.tipo} show={mensaje.mostrar} onClose={() => setMensaje({ mostrar: false })} delay={3000} autohide>
+    <Toast.Body>{mensaje.texto}</Toast.Body>
+  </Toast>
+</ToastContainer>
+
       {/* Menú Superior */}
       <Navbar bg="light" expand="lg" className="p-3 mb-3 rounded shadow-sm">
         <Container>
