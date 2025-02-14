@@ -7,9 +7,11 @@ const GeneradorCodigos = ({ abrirCrud }) => {
 
   const manejarSeleccion = (index, nivelSeleccionado) => {
     let nuevosNiveles = [...niveles];
-    nuevosNiveles[index] = nivelSeleccionado;
 
-    // Limpiar niveles siguientes
+    // ✅ Verifica si `nivelSeleccionado` es `null` y asigna un objeto vacío
+    nuevosNiveles[index] = nivelSeleccionado || { id: "", codigo: "" };
+
+    // ✅ Limpiar niveles siguientes para evitar valores incorrectos
     for (let i = index + 1; i < niveles.length; i++) {
       nuevosNiveles[i] = { id: "", codigo: "" };
     }
@@ -19,17 +21,20 @@ const GeneradorCodigos = ({ abrirCrud }) => {
 
   const generarCodigo = () => {
     const codigo = niveles
-      .filter((nivel) => nivel.codigo)
+      .filter((nivel) => nivel && nivel.codigo) // ✅ Verifica que `nivel` no sea null
       .map((nivel) => nivel.codigo)
       .join("");
 
     // Opcionalmente puedes mostrar un alert o hacer algo con el código generado
-    console.log("Código generado:", codigo);
+    console.log(
+      "Código generado:",
+      codigo || "Ningún código seleccionado aún."
+    );
   };
 
   const copiarCodigo = () => {
     const codigo = niveles
-      .filter((nivel) => nivel.codigo)
+      .filter((nivel) => nivel && nivel.codigo)
       .map((nivel) => nivel.codigo)
       .join("");
 

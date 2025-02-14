@@ -13,7 +13,7 @@ import {
 
 const CrudNiveles = ({ cerrarCrud }) => {
   const [niveles, setNiveles] = useState([]);
-  const [setNivelesFiltrados] = useState([]);
+  const [nivelesFiltrados, setNivelesFiltrados] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modo, setModo] = useState("");
   const [nivelSeleccionado, setNivelSeleccionado] = useState(null);
@@ -177,49 +177,53 @@ const CrudNiveles = ({ cerrarCrud }) => {
           </tr>
         </thead>
         <tbody>
-          {niveles.map((nivel) => (
-            <tr key={nivel.id}>
-              <td>{nivel.codigo}</td>
-              <td>{nivel.nombre}</td>
-              <td>
-                {nivel.nivelPadre
-                  ? `${nivel.nivelPadre.codigo || "Sin código"} - ${
-                      nivel.nivelPadre.nombre || "Sin nombre"
-                    }`
-                  : "Raíz"}
-              </td>
-              <td>
-                <Button
-                  variant="info"
-                  className="me-2"
-                  onClick={() => abrirModal("Ver", nivel)}
-                >
-                  Ver
-                </Button>
-                <Button
-                  variant="warning"
-                  className="me-2"
-                  onClick={() => abrirModal("Modificar", nivel)}
-                >
-                  Editar
-                </Button>
-                <Button
-                  variant="danger"
-                  className="me-2"
-                  onClick={() => eliminarNivel(nivel.id)}
-                >
-                  Eliminar
-                </Button>
-                <Button
-                  variant="primary"
-                  className="me-2"
-                  onClick={() => abrirModal("CrearSubnivel", nivel)}
-                >
-                  + Subnivel
-                </Button>
-              </td>
-            </tr>
-          ))}
+          {nivelesFiltrados.map(
+            (
+              nivel // ✅ Usar niveles filtrados
+            ) => (
+              <tr key={nivel.id}>
+                <td>{nivel.codigo}</td>
+                <td>{nivel.nombre}</td>
+                <td>
+                  {nivel.nivelPadre
+                    ? `${nivel.nivelPadre.codigo || "Sin código"} - ${
+                        nivel.nivelPadre.nombre || "Sin nombre"
+                      }`
+                    : "Raíz"}
+                </td>
+                <td>
+                  <Button
+                    variant="info"
+                    className="me-2"
+                    onClick={() => abrirModal("Ver", nivel)}
+                  >
+                    Ver
+                  </Button>
+                  <Button
+                    variant="warning"
+                    className="me-2"
+                    onClick={() => abrirModal("Modificar", nivel)}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    variant="danger"
+                    className="me-2"
+                    onClick={() => eliminarNivel(nivel.id)}
+                  >
+                    Eliminar
+                  </Button>
+                  <Button
+                    variant="primary"
+                    className="me-2"
+                    onClick={() => abrirModal("CrearSubnivel", nivel)}
+                  >
+                    + Subnivel
+                  </Button>
+                </td>
+              </tr>
+            )
+          )}
         </tbody>
       </Table>
 
