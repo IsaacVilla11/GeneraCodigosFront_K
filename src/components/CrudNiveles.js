@@ -155,9 +155,11 @@ const CrudNiveles = ({ cerrarCrud }) => {
   };
 
   const eliminarNivel = async (id) => {
-    const confirmacion = window.confirm("¿Estás seguro de que deseas eliminar este nivel?");
+    const confirmacion = window.confirm(
+      "¿Estás seguro de que deseas eliminar este nivel?"
+    );
     if (!confirmacion) return;
-  
+
     try {
       await axios.delete(`http://localhost:8080/api/niveles/${id}`);
       mostrarMensaje("✅ Nivel eliminado con éxito.");
@@ -176,10 +178,16 @@ const CrudNiveles = ({ cerrarCrud }) => {
   return (
     <Container className="mt-4">
       <ToastContainer position="top-end" className="p-3">
-  <Toast bg={mensaje.tipo} show={mensaje.mostrar} onClose={() => setMensaje({ mostrar: false })} delay={3000} autohide>
-    <Toast.Body>{mensaje.texto}</Toast.Body>
-  </Toast>
-</ToastContainer>
+        <Toast
+          bg={mensaje.tipo}
+          show={mensaje.mostrar}
+          onClose={() => setMensaje({ mostrar: false })}
+          delay={3000}
+          autohide
+        >
+          <Toast.Body>{mensaje.texto}</Toast.Body>
+        </Toast>
+      </ToastContainer>
 
       {/* Menú Superior */}
       <Navbar bg="light" expand="lg" className="p-3 mb-3 rounded shadow-sm">

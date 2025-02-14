@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { Form, Button, Modal } from "react-bootstrap";
-import { FaEdit, FaTrash, FaInfo } from "react-icons/fa";
+import { FaEdit, FaTrash, FaInfo, FaPlus } from "react-icons/fa";
 import axios from "axios";
 
 const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
@@ -106,10 +106,18 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
 
   const cargarInfoNivel = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/niveles/jerarquia/${value.id}`
-      );
-      setNivelInfo(response.data);
+      const [infoBasica, infoJerarquia] = await Promise.all([
+        axios.get(`http://localhost:8080/api/niveles/${value.id}`),
+        axios.get(`http://localhost:8080/api/niveles/jerarquia/${value.id}`),
+      ]);
+
+      // Combinar la información de ambas respuestas
+      setNivelInfo({
+        ...infoBasica.data, // Información básica (nombre, código, padre)
+        rutaCompleta: infoJerarquia.data.rutaCompleta, // Ruta completa
+        subniveles: infoJerarquia.data.subniveles, // Subniveles si existen
+      });
+
       setMostrarModalInfo(true);
     } catch (error) {
       console.error("❌ Error al cargar información del nivel:", error);
@@ -134,22 +142,28 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
 
   return (
     <div className="d-flex align-items-center">
-      <Form.Control as="select" onChange={handleChange} value={value?.id || ""}>
-        <option value="">Seleccione un nivel</option>
-        {niveles.length > 0 ? (
-          niveles.map((n) => (
-            <option key={n.id} value={n.id}>
-              {n.codigo} - {n.nombre}
-            </option>
-          ))
-        ) : (
-          <option disabled>No hay niveles disponibles</option>
-        )}
-        <option value="agregar">+ Agregar subnivel</option>
-      </Form.Control>
+      <div className="flex-grow-1">
+        <Form.Control
+          as="select"
+          onChange={handleChange}
+          value={value?.id || ""}
+        >
+          <option value="">Seleccione un nivel</option>
+          {niveles.length > 0 ? (
+            niveles.map((n) => (
+              <option key={n.id} value={n.id}>
+                {n.codigo} - {n.nombre}
+              </option>
+            ))
+          ) : (
+            <option disabled>No hay niveles disponibles</option>
+          )}
+          <option value="agregar">+ Agregar subnivel</option>
+        </Form.Control>
+      </div>
 
       {value?.id && (
-        <div className="ms-2">
+        <div className="d-flex ms-2">
           <Button
             variant="outline-primary"
             size="sm"
@@ -303,21 +317,28 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
                 <strong>Nombre:</strong> {nivelInfo.nombre}
               </p>
               <p>
-                <strong>Ruta Completa:</strong> {nivelInfo.rutaCompleta}
+                <strong>Nivel Padre:</strong>{" "}
+                {nivelInfo.nivelPadre ? nivelInfo.nivelPadre.nombre : "Raíz"}
               </p>
+              {/* Sección de Ruta Completa */}
+              <div className="mt-4">
+                <strong>Ruta Completa:</strong>
+                <p className="text-muted">
+                  {nivelInfo.rutaCompleta || "No disponible"}
+                </p>
+              </div>
+              {/* Sección de Subniveles */}
               {nivelInfo.subniveles && nivelInfo.subniveles.length > 0 && (
-                <>
-                  <p>
-                    <strong>Subniveles:</strong>
-                  </p>
-                  <ul>
+                <div className="mt-4">
+                  <strong>Subniveles:</strong>
+                  <ul className="list-group mt-2">
                     {nivelInfo.subniveles.map((subnivel) => (
-                      <li key={subnivel.id}>
-                        {subnivel.codigo} - {subnivel.nombre}
+                      <li key={subnivel.id} className="list-group-item">
+                        <strong>{subnivel.codigo}</strong> - {subnivel.nombre}
                       </li>
                     ))}
                   </ul>
-                </>
+                </div>
               )}
             </>
           )}
