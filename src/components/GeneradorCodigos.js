@@ -17,7 +17,7 @@ const GeneradorCodigos = ({ abrirCrud }) => {
       const response = await axios.get(
         "http://localhost:8080/api/niveles/cantidadMaxima"
       );
-      const cantidadNiveles = Math.max(6, response.data);
+      const cantidadNiveles = Math.max(6, response.data + 1);
       setTotalNiveles(cantidadNiveles);
       setNiveles(Array(cantidadNiveles).fill({ id: "", codigo: "" }));
     } catch (error) {
@@ -52,13 +52,13 @@ const GeneradorCodigos = ({ abrirCrud }) => {
     <div className="d-flex justify-content-center align-items-center vh-100">
       <Card
         className="shadow-lg p-4"
-        style={{ maxWidth: "1000px", width: "100%" }}
+        style={{ maxWidth: "750px", width: "100%" }}
       >
         {/* Título y botón de gestión alineado a la izquierda */}
         <Row className="align-items-center mb-4">
           <Col xs={6} className="text-start">
             <h3 className="text-success fw-bold">
-              Generador de Códigos KEIKO TECH
+              Generador de Códigos
             </h3>
           </Col>
           <Col xs={6} className="text-end">
@@ -69,7 +69,7 @@ const GeneradorCodigos = ({ abrirCrud }) => {
         </Row>
 
         {/* Niveles alineados a la izquierda */}
-        <Row className="justify-content-start">
+        <Row className="justify-content-let">
           <Col xs={12}>
             {Array.from({ length: totalNiveles }, (_, i) => (
               <Row key={i} className="mb-2 align-items-center">
@@ -90,7 +90,7 @@ const GeneradorCodigos = ({ abrirCrud }) => {
         </Row>
 
         {/* Código generado y botón de copiar alineado a la izquierda */}
-        <Row className="mt-4 align-items-center">
+        <Row className="mt-4 align-items-left">
           <Col xs={8} className="text-start">
             <Card
               className="p-3 bg-light shadow-sm text-center"

@@ -66,9 +66,7 @@ const CrudNiveles = ({ cerrarCrud }) => {
     try {
       const response = await axios.get("http://localhost:8080/api/niveles");
 
-      // 📌 Verificar datos recibidos antes de procesarlos
       //console.log("📌 Datos recibidos en el frontend:", response.data);
-
       // Cargar padres si solo llega el ID en vez del objeto
       const nivelesConPadre = await Promise.all(
         response.data.map(async (nivel) => {
@@ -97,7 +95,7 @@ const CrudNiveles = ({ cerrarCrud }) => {
     setModo(modo);
 
     if (modo === "Crear") {
-      setNuevoNivel({ codigo: "", nombre: "", nivelPadreId: "" }); // ✅ Se asegura de que los campos estén vacíos
+      setNuevoNivel({ codigo: "", nombre: "", nivelPadreId: "" });
     } else if (modo === "CrearSubnivel" && nivel) {
       setNuevoNivel({ codigo: "", nombre: "", nivelPadreId: nivel.id });
     } else if (modo === "Modificar" && nivel) {
@@ -149,7 +147,6 @@ const CrudNiveles = ({ cerrarCrud }) => {
       cargarNiveles();
       setMostrarModal(false);
     } catch (error) {
-      console.error("❌ Error al guardar nivel:", error);
       mostrarMensaje("❌ Error al guardar nivel.", "danger");
     }
   };
@@ -165,7 +162,6 @@ const CrudNiveles = ({ cerrarCrud }) => {
       mostrarMensaje("✅ Nivel eliminado con éxito.");
       cargarNiveles();
     } catch (error) {
-      console.error("❌ Error al eliminar nivel:", error);
       mostrarMensaje("❌ No se pudo eliminar el nivel.", "danger");
     }
   };

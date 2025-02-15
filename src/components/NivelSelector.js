@@ -165,6 +165,14 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
       {value?.id && (
         <div className="d-flex ms-2">
           <Button
+            variant="outline-success"
+            size="sm"
+            className="me-1"
+            onClick={() => setMostrarModal(true)}
+          >
+            <FaPlus />
+          </Button>
+          <Button
             variant="outline-primary"
             size="sm"
             className="me-1"
