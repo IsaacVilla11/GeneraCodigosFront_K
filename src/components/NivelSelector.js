@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import { Form, Button, Modal } from "react-bootstrap";
 import { FaEdit, FaTrash, FaInfo, FaPlus } from "react-icons/fa";
 import axios from "axios";
+import { API_URL } from "../config";
 
 const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
   const [niveles, setNiveles] = useState([]);
@@ -19,12 +20,12 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
     try {
       setLoading(true);
       setError(null);
-      let url = "http://localhost:8080/api/niveles/padre";
+      let url = `${API_URL}/niveles/padre`;
 
       if (nivel === 1) {
         // Cargar niveles raíz
       } else if (nivel > 1 && nivelPadre) {
-        url = `http://localhost:8080/api/niveles/padre?nivelPadreId=${nivelPadre}`;
+        url = `${API_URL}/niveles/padre?nivelPadreId=${nivelPadre}`;
       } else {
         setLoading(false);
         return;
@@ -33,7 +34,7 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
       const response = await axios.get(url);
       setNiveles(response.data);
     } catch (error) {
-      console.error("❌ Error al cargar niveles:", error);
+      //console.error("❌ Error al cargar niveles:", error);
       setError("Error al cargar niveles. Intente nuevamente.");
       setNiveles([]);
     } finally {
@@ -66,7 +67,7 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
         nombre: nuevoNivel.nombre,
         nivelPadre: nivelPadre ? { id: Number(nivelPadre) } : null,
       };
-      await axios.post("http://localhost:8080/api/niveles", nivelData);
+      await axios.post(`${API_URL}/niveles`, nivelData);
       setMostrarModal(false);
       setNuevoNivel({ codigo: "", nombre: "" });
       cargarNiveles();
@@ -82,10 +83,7 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
         nombre: nivelEditar.nombre,
         nivelPadre: nivelPadre ? { id: Number(nivelPadre) } : null,
       };
-      await axios.put(
-        `http://localhost:8080/api/niveles/${value.id}`,
-        nivelData
-      );
+      await axios.put(`${API_URL}/niveles/${value.id}`, nivelData);
       setMostrarModalEditar(false);
       cargarNiveles();
     } catch (error) {
@@ -95,7 +93,7 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
 
   const eliminarNivel = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/niveles/${value.id}`);
+      await axios.delete(`${API_URL}/niveles/${value.id}`);
       setMostrarModalEliminar(false);
       onSelect(null);
       cargarNiveles();
@@ -107,8 +105,8 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
   const cargarInfoNivel = async () => {
     try {
       const [infoBasica, infoJerarquia] = await Promise.all([
-        axios.get(`http://localhost:8080/api/niveles/${value.id}`),
-        axios.get(`http://localhost:8080/api/niveles/jerarquia/${value.id}`),
+        axios.get(`${API_URL}/niveles/${value.id}`),
+        axios.get(`${API_URL}/niveles/jerarquia/${value.id}`),
       ]);
 
       // Combinar la información de ambas respuestas

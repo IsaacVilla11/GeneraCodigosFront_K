@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Toast, ToastContainer } from "react-bootstrap";
+import { API_URL } from "../config";
 import {
   Button,
   Table,
@@ -64,7 +65,8 @@ const CrudNiveles = ({ cerrarCrud }) => {
 
   const cargarNiveles = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/niveles");
+      const response = await axios.get(`${API_URL}/niveles`);
+
 
       //console.log("📌 Datos recibidos en el frontend:", response.data);
       // Cargar padres si solo llega el ID en vez del objeto
@@ -73,7 +75,7 @@ const CrudNiveles = ({ cerrarCrud }) => {
           if (nivel.nivelPadre && typeof nivel.nivelPadre === "number") {
             try {
               const padreResponse = await axios.get(
-                `http://localhost:8080/api/niveles/${nivel.nivelPadre}`
+                `${API_URL}/niveles/${nivel.nivelPadre}`
               );
               return { ...nivel, nivelPadre: padreResponse.data };
             } catch (error) {
@@ -108,7 +110,7 @@ const CrudNiveles = ({ cerrarCrud }) => {
     } else if (modo === "Ver" && nivel) {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/niveles/jerarquia/${nivel.id}`
+          `${API_URL}/niveles/jerarquia/${nivel.id}`
         );
         setNivelSeleccionado({
           ...nivel,
@@ -135,11 +137,11 @@ const CrudNiveles = ({ cerrarCrud }) => {
 
     try {
       if (modo === "Crear" || modo === "CrearSubnivel") {
-        await axios.post("http://localhost:8080/api/niveles", nivelData);
+        await axios.post(`${API_URL}/niveles`, nivelData);
         mostrarMensaje("✅ Nivel creado con éxito.");
       } else {
         await axios.put(
-          `http://localhost:8080/api/niveles/${nuevoNivel.id}`,
+          `${API_URL}/niveles/${nuevoNivel.id}`,
           nivelData
         );
         mostrarMensaje("✅ Nivel actualizado con éxito.");
@@ -158,7 +160,7 @@ const CrudNiveles = ({ cerrarCrud }) => {
     if (!confirmacion) return;
 
     try {
-      await axios.delete(`http://localhost:8080/api/niveles/${id}`);
+      await axios.delete(`${API_URL}/niveles/${id}`);
       mostrarMensaje("✅ Nivel eliminado con éxito.");
       cargarNiveles();
     } catch (error) {

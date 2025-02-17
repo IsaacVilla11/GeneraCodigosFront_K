@@ -3,6 +3,7 @@ import NivelSelector from "./NivelSelector";
 import { Button, Row, Col, Card } from "react-bootstrap";
 import axios from "axios";
 import { FaCopy, FaCog } from "react-icons/fa";
+import { API_URL } from "../config";
 
 const GeneradorCodigos = ({ abrirCrud }) => {
   const [niveles, setNiveles] = useState([]);
@@ -15,13 +16,13 @@ const GeneradorCodigos = ({ abrirCrud }) => {
   const obtenerCantidadNiveles = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/niveles/cantidadMaxima"
+        `${API_URL}/niveles/cantidadMaxima`
       );
       const cantidadNiveles = Math.max(6, response.data + 1);
       setTotalNiveles(cantidadNiveles);
       setNiveles(Array(cantidadNiveles).fill({ id: "", codigo: "" }));
     } catch (error) {
-      console.error("❌ Error al obtener la cantidad de niveles:", error);
+      //console.error("❌ Error al obtener la cantidad de niveles:", error);
     }
   };
 
