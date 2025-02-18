@@ -15,9 +15,7 @@ const GeneradorCodigos = ({ abrirCrud }) => {
 
   const obtenerCantidadNiveles = async () => {
     try {
-      const response = await axios.get(
-        `${API_URL}/niveles/cantidadMaxima`
-      );
+      const response = await axios.get(`${API_URL}/niveles/cantidadMaxima`);
       const cantidadNiveles = Math.max(6, response.data + 1);
       setTotalNiveles(cantidadNiveles);
       setNiveles(Array(cantidadNiveles).fill({ id: "", codigo: "" }));
@@ -40,7 +38,9 @@ const GeneradorCodigos = ({ abrirCrud }) => {
   const copiarCodigo = () => {
     const codigo = niveles
       .filter((nivel) => nivel && nivel.codigo)
-      .map((nivel) => nivel.codigo)
+      .map(
+        (nivel) => nivel.codigo.split("*")[0]
+      ) /* el codigo generado ignora todo despues del * */
       .join("");
 
     navigator.clipboard
@@ -58,9 +58,7 @@ const GeneradorCodigos = ({ abrirCrud }) => {
         {/* Título y botón de gestión alineado a la izquierda */}
         <Row className="align-items-center mb-4">
           <Col xs={6} className="text-start">
-            <h3 className="text-success fw-bold">
-              Generador de Códigos
-            </h3>
+            <h3 className="text-success fw-bold">Generador de Códigos</h3>
           </Col>
           <Col xs={6} className="text-end">
             <Button variant="primary" onClick={abrirCrud}>
@@ -100,7 +98,9 @@ const GeneradorCodigos = ({ abrirCrud }) => {
               <h5 className="mb-0 text-dark text-truncate">
                 {niveles
                   .filter((n) => n.codigo)
-                  .map((n) => n.codigo)
+                  .map(
+                    (n) => n.codigo.split("*")[0]
+                  ) /* el codigo generado ignora todo despues del * */
                   .join("") || "Código generado aquí"}
               </h5>
             </Card>

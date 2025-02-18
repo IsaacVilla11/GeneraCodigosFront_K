@@ -150,7 +150,7 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
           {niveles.length > 0 ? (
             niveles.map((n) => (
               <option key={n.id} value={n.id}>
-                {n.codigo} - {n.nombre}
+                 {n.nombre}
               </option>
             ))
           ) : (
