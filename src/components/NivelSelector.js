@@ -121,6 +121,42 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
       console.error("❌ Error al cargar información del nivel:", error);
     }
   };
+  const generarCodigo = (nombre, nivel) => {
+    if (!nombre) return "";
+
+    const palabras = nombre.trim().split(/\s+/); // Separa por espacios
+    let codigo = "";
+
+    if (nivel === 1) {
+      // 1er nivel:
+      if (palabras.length === 1) {
+        codigo = palabras[0].substring(0, 3).toUpperCase(); // 3 primeras letras
+      } else {
+        codigo = palabras.map(p => p.charAt(0).toUpperCase()).join(""); // Iniciales
+      }
+    } else if (nivel >= 2 && nivel <= 4) {
+      // 2do a 4to nivel:
+      if (palabras.length === 1) {
+        codigo = palabras[0].substring(0, 2).toUpperCase(); // 2 primeras letras
+      } else {
+        codigo = palabras.map(p => p.charAt(0).toUpperCase()).join("").substring(0, 2); // Iniciales (máx 2 letras)
+      }
+    } else {
+      // Desde 5to nivel en adelante:
+      if (!isNaN(parseInt(palabras[0]))) {
+        // Si comienza con un número: unir todas las palabras sin espacios
+        codigo = palabras.join("").toUpperCase();
+      } else {
+        // Si es palabra: 1 letra por nivel
+        codigo = palabras.map(p => p.charAt(0).toUpperCase()).join("").substring(0, 1);
+      }
+    }
+
+
+
+    return codigo;
+  };
+
 
   if (loading) {
     return (
@@ -219,11 +255,13 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
             <Form.Group className="mb-3">
               <Form.Label>Nombre</Form.Label>
               <Form.Control
-                type="text"
-                value={nuevoNivel.nombre}
-                onChange={(e) =>
-                  setNuevoNivel({ ...nuevoNivel, nombre: e.target.value })
-                }
+                  type="text"
+                  value={nuevoNivel.nombre}
+                  onChange={(e) => setNuevoNivel({
+                    ...nuevoNivel,
+                    nombre: e.target.value,
+                    codigo: generarCodigo(e.target.value, nivel) // Genera automáticamente
+                  })}
               />
             </Form.Group>
           </Form>
@@ -261,11 +299,13 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
             <Form.Group className="mb-3">
               <Form.Label>Nombre</Form.Label>
               <Form.Control
-                type="text"
-                value={nivelEditar.nombre}
-                onChange={(e) =>
-                  setNivelEditar({ ...nivelEditar, nombre: e.target.value })
-                }
+                  type="text"
+                  value={nivelEditar.nombre}
+                  onChange={(e) => setNivelEditar({
+                    ...nivelEditar,
+                    nombre: e.target.value,
+                    codigo: generarCodigo(e.target.value, nivel) // Genera automáticamente
+                  })}
               />
             </Form.Group>
           </Form>
