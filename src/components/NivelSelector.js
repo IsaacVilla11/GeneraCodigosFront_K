@@ -124,22 +124,28 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
   const generarCodigo = (nombre, nivel) => {
     if (!nombre) return "";
 
-    const palabras = nombre.trim().split(/\s+/); // Separa por espacios
+    const conectores = ["de", "del", "la", "las", "el", "los", "y", "para", "con", "a", "en"]; // Lista de conectores a omitir
+    const palabras = nombre
+        .trim()
+        .split(/\s+/) // Separa por espacios
+        .filter(p => !conectores.includes(p.toLowerCase())); // Filtra conectores
+
     let codigo = "";
+    let maxLetras = 1; // Por defecto, 1 letra por nivel desde el 5to en adelante
 
     if (nivel === 1) {
-      // 1er nivel:
+      maxLetras = 3; // 1er nivel: máximo 3 letras
       if (palabras.length === 1) {
-        codigo = palabras[0].substring(0, 3).toUpperCase(); // 3 primeras letras
+        codigo = palabras[0].substring(0, maxLetras).toUpperCase(); // 3 primeras letras
       } else {
-        codigo = palabras.map(p => p.charAt(0).toUpperCase()).join(""); // Iniciales
+        codigo = palabras.map(p => p.charAt(0).toUpperCase()).join("").substring(0, maxLetras); // Iniciales hasta el límite
       }
     } else if (nivel >= 2 && nivel <= 4) {
-      // 2do a 4to nivel:
+      maxLetras = 2; // 2do a 4to nivel: máximo 2 letras
       if (palabras.length === 1) {
-        codigo = palabras[0].substring(0, 2).toUpperCase(); // 2 primeras letras
+        codigo = palabras[0].substring(0, maxLetras).toUpperCase(); // 2 primeras letras
       } else {
-        codigo = palabras.map(p => p.charAt(0).toUpperCase()).join("").substring(0, 2); // Iniciales (máx 2 letras)
+        codigo = palabras.map(p => p.charAt(0).toUpperCase()).join("").substring(0, maxLetras); // Iniciales hasta el límite
       }
     } else {
       // Desde 5to nivel en adelante:
@@ -147,15 +153,14 @@ const NivelSelector = ({ nivel, nivelPadre, onSelect, value }) => {
         // Si comienza con un número: unir todas las palabras sin espacios
         codigo = palabras.join("").toUpperCase();
       } else {
-        // Si es palabra: 1 letra por nivel
-        codigo = palabras.map(p => p.charAt(0).toUpperCase()).join("").substring(0, 1);
+        // Si es palabra: tomar 1 letra por nivel
+        codigo = palabras.map(p => p.charAt(0).toUpperCase()).join("").substring(0, maxLetras);
       }
     }
 
-
-
     return codigo;
   };
+
 
 
   if (loading) {
